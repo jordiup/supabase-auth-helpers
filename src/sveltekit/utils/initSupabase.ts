@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const getClientWithEnvCheck = (
   supabaseUrl: string | undefined,
@@ -15,5 +15,4 @@ const getClientWithEnvCheck = (
   });
 };
 
-export { getClientWithEnvCheck, SupabaseClient };
-// export const supabaseClient = getClientWithEnvCheck();
+export { getClientWithEnvCheck };

@@ -1,4 +1,3 @@
-export { SupabaseClient } from './utils/initSupabase';
 import { getClientWithEnvCheck } from './utils/initSupabase';
 
 let supabaseUrl: string | undefined;

@@ -1,21 +1,29 @@
-import type { Handle } from '@sveltejs/kit';
 import { CookieOptions } from '../../nextjs/types';
 import {
   SvelteKitRequestAdapter,
   SvelteKitResponseAdapter
 } from '../../shared/adapters/SvelteKitAdapter';
+import { COOKIE_OPTIONS } from '../../shared/utils/constants';
 import { setCookies } from '../../shared/utils/cookies';
+import { HandleOptions } from '../types';
 
-export const handleCallback = (cookieOptions: CookieOptions) => {
-  const handle: Handle = async ({ event, resolve }) => {
+export const handleCallback = (
+  cookieOptions: CookieOptions = COOKIE_OPTIONS
+) => {
+  const handle = async ({ event, resolve }: HandleOptions) => {
     const req = event.request;
     let res = await resolve(event);
+
+    // if not a callback route return
+    if (event.url.pathname !== '/api/auth/callback') {
+      return res;
+    }
 
     if (req.method !== 'POST') {
       const headers = new Headers({
         Allow: 'POST'
       });
-      return new Response(null, { headers, status: 405 });
+      return new Response('Method Not Allowed', { headers, status: 405 });
     }
 
     const { event: bodyEvent, session } = await req.json();

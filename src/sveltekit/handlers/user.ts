@@ -1,18 +1,13 @@
-import type { Handle } from '@sveltejs/kit';
+// import type { Handle } from '@sveltejs/kit';
 import { ApiError, CookieOptions } from '../../nextjs/types';
-import { COOKIE_OPTIONS } from '../../shared/utils/constants';
 import { jwtDecoder, parseCookie } from '../../shared/utils';
-import { json } from '../utils/json';
+import { COOKIE_OPTIONS } from '../../shared/utils/constants';
+import { HandleOptions } from '../types';
 import getUser from '../utils/getUser';
 
-export default async function handleUser(
-  cookieOptions: CookieOptions = COOKIE_OPTIONS
-) {
-  const handle: Handle = async ({ event, resolve }) => {
+export const handleUser = (cookieOptions: CookieOptions = COOKIE_OPTIONS) => {
+  const handle = async ({ event, resolve }: HandleOptions) => {
     const req = event.request;
-    const headers = new Headers({
-      'Content-Type': 'application/json'
-    });
 
     try {
       if (!req.headers.has('cookie')) {
@@ -37,9 +32,11 @@ export default async function handleUser(
         const res = await resolve(event);
         // JWT is expired, let's refresh from Gotrue
         const response = await getUser({ req, res }, cookieOptions);
-        return json(response);
+        event.locals.user = response.user;
+        event.locals.accessToken = response.accessToken;
+        return await resolve(event);
       } else {
-        // Transform JWT and add note that it ise cached from JWT.
+        // Transform JWT and add note that it is cached from JWT.
         const user = {
           id: jwtUser.sub,
           aud: null,
@@ -58,18 +55,18 @@ export default async function handleUser(
             'This user payload is retrieved from the cached JWT and might be stale. If you need up to date user data, please call the `getUser` method in a server-side context!'
         };
         const mergedUser = { ...user, ...jwtUser };
-        return json({ user: mergedUser, accessToken: access_token });
+        event.locals.user = mergedUser;
+        event.locals.accessToken = access_token;
+        // set supabase auth
+        return await resolve(event);
       }
     } catch (e) {
       const error = e as ApiError;
-      return json(
-        { user: null, accessToken: null, error: error.message },
-        {
-          headers,
-          status: 400
-        }
-      );
+      event.locals.user = null;
+      event.locals.error = error;
+      event.locals.accessToken = null;
+      return await resolve(event);
     }
   };
   return handle;
-}
+};

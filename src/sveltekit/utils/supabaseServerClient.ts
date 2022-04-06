@@ -1,5 +1,5 @@
-// import { supabaseClient, SupabaseClient } from './initSupabase';
-import { skHelper, SupabaseClient } from '../instance';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { skHelper } from '../instance';
 import { CookieOptions } from '../../nextjs/types';
 
 /**

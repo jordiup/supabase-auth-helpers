@@ -1,4 +1,5 @@
-import { User, createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { CookieOptions } from '../../nextjs/types';
 import { parseCookie, setCookies, jwtDecoder } from '../../shared/utils';
 import { COOKIE_OPTIONS } from '../../shared/utils/constants';
@@ -40,6 +41,10 @@ export default async function getUser(
     if (!access_token) {
       throw new Error('No cookie found!');
     }
+
+    // if we have a token, set the client to use it so we can make authorized requests to Supabase
+    supabase.auth.setAuth(access_token);
+
     // Get payload from access token.
     const jwtUser = jwtDecoder(access_token);
     if (!jwtUser?.exp) {
@@ -86,7 +91,6 @@ export default async function getUser(
       return { user, accessToken: access_token };
     }
   } catch (e) {
-    console.log({ e });
     return { user: null, accessToken: null };
   }
 }

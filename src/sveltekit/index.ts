@@ -1,5 +1,5 @@
 // Types
-export { User } from '@supabase/supabase-js';
+export type { User, SupabaseClient } from '@supabase/supabase-js';
 
 // Methods
 export * from './handlers';
@@ -7,4 +7,4 @@ export * from './handlers';
 // export { default as withAuthRequired } from './utils/withAuthRequired';
 // export { default as supabaseServerClient } from './utils/supabaseServerClient';
 // export { supabaseClient, SupabaseClient } from './utils/initSupabase';
-export { skHelper, SupabaseClient } from './instance';
+export { skHelper } from './instance';

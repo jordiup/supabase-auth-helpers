@@ -1,1 +1,2 @@
-export { default as handleAuth } from './auth';
+export { handleCallback } from './callback';
+export { handleUser } from './user';
