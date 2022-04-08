@@ -7,4 +7,5 @@ export * from './handlers';
 // export { default as withAuthRequired } from './utils/withAuthRequired';
 // export { default as supabaseServerClient } from './utils/supabaseServerClient';
 // export { supabaseClient, SupabaseClient } from './utils/initSupabase';
+export { UserStore } from './UserStore';
 export { skHelper } from './instance';

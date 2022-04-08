@@ -5,24 +5,17 @@
 <script type="ts">
 	import { setContext } from 'svelte';
 	import type { SupabaseClient } from '@supabase/supabase-js';
-	import { session } from '$app/stores';
-	import { UserStore } from '@supabase/supabase-auth-helpers/dist/svelte';
+	import { UserStore } from '@supabase/supabase-auth-helpers/dist/sveltekit';
 
 	export let supabaseClient: SupabaseClient;
 	export let callbackUrl = '/api/auth/callback';
-	export let user = null;
-	export let cb = () => {};
+	export let redirectUrl = '/';
 
-	const userStore = UserStore({ supabaseClient, callbackUrl, user });
+	const userStore = UserStore({ supabaseClient, callbackUrl, redirectUrl });
 
-	userStore.checkAuthState(cb);
+	userStore.checkAuthState();
 
 	setContext(key, userStore);
-
-	$: {
-		user = $session.user;
-		console.log({ user });
-	}
 </script>
 
 <slot />

@@ -16,7 +16,14 @@ module.exports = {
     'src/sveltekit'
   ],
   // `aws-amplify` is external, but sub-dependencies weren't automatically externalized ("require" statements were included)
-  external: ['next', 'svelte', /^@supabase\//, /^@sveltejs\//],
+  external: [
+    'next',
+    'svelte',
+    'react',
+    /^@supabase\//,
+    /^@sveltejs\//,
+    /^\$app\//
+  ],
   format: ['cjs', 'esm'],
   //   inject: ['src/react-shim.js'],
   // ! .cjs/.mjs doesn't work with Angular's webpack4 config by default!

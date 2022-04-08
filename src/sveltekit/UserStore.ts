@@ -1,25 +1,62 @@
-import { SupabaseClient, Subscription } from '@supabase/supabase-js';
+import { SupabaseClient, Subscription, User } from '@supabase/supabase-js';
 import { writable, Writable } from 'svelte/store';
+import { redirect } from './helpers';
+
+interface UserData {
+  user: User | null;
+  accessToken: string | null;
+}
+
+type UserFetcher = (url: string) => Promise<UserData>;
+const userFetcher: UserFetcher = async (url) => {
+  const response = await fetch(url, { method: 'POST' });
+  return response.ok ? response.json() : { user: null, accessToken: null };
+};
 
 export interface Props {
   supabaseClient: SupabaseClient;
   callbackUrl?: string;
+  profileUrl?: string;
+  redirectUrl?: string;
   [propName: string]: any;
 }
 
 interface UserStore {
   isLoading: Writable<boolean>;
   error: Writable<Error>;
-  checkAuthState: (cb: () => void) => Subscription | null;
+  checkAuthState: () => Subscription | null;
 }
 
 const createUserStore = (props: Props) => {
-  const { supabaseClient, callbackUrl = '/api/auth/callback' } = props;
+  const {
+    supabaseClient,
+    callbackUrl = '/api/auth/callback',
+    profileUrl = '/api/auth/user',
+    redirectUrl = '/'
+  } = props;
 
   const isLoading = writable<boolean>(false);
   const error = writable<Error>();
 
-  const checkAuthState = (cb: () => void) => {
+  const checkSession = async (): Promise<UserData> => {
+    try {
+      const { user, accessToken } = await userFetcher(profileUrl);
+      if (accessToken) {
+        supabaseClient.auth.setAuth(accessToken);
+      }
+      if (!user) isLoading.set(false);
+      return {
+        user,
+        accessToken
+      };
+    } catch (_e) {
+      const err = new Error(`The request to ${profileUrl} failed`);
+      error.set(err);
+      return { user: null, accessToken: null };
+    }
+  };
+
+  const checkAuthState = () => {
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         isLoading.set(true);
@@ -36,10 +73,10 @@ const createUserStore = (props: Props) => {
             error.set(err);
           }
         });
+        // Fetch the user from the API route
+        const { user } = await checkSession();
         isLoading.set(false);
-        if (typeof cb === 'function') {
-          cb();
-        }
+        redirect(redirectUrl)(user);
       }
     );
 

@@ -1,36 +1,25 @@
-<script context="module">
-	export async function load({ session }) {
-		console.log({ session });
-		return {
-			status: 200
-		};
-	}
-</script>
-
 <script>
 	import Auth from 'supabase-ui-svelte';
 	import { key } from '$lib/UserContext.svelte';
 	import { supabaseClient } from '$lib/db';
 	import { getContext } from 'svelte';
 	import { session } from '$app/stores';
+	import { goto } from '$app/navigation';
 
-	// const { getUser } = getContext(key);
 	const { isLoading, error } = getContext(key);
-	let loadedData;
+	let loadedData = [];
 	async function loadData() {
 		const { data } = await supabaseClient.from('test').select('*').single();
 		loadedData = data;
 	}
 
 	async function signOut() {
-		console.log('logging out...');
 		await supabaseClient.auth.signOut();
+		await goto('/');
 	}
 
-	$: console.log(`In index.svelte:`, { loading: $isLoading, user: $session.user });
 	$: {
-		if ($session.user) {
-			console.log(`user`, { user: $session.user });
+		if ($session.user && $session.user.id) {
 			loadData();
 		}
 	}

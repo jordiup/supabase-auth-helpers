@@ -12,12 +12,3 @@ export async function post(/*req , res: Response (read the notes below) */) {
 		body: {}
 	};
 }
-
-/**
- * @type {import('@sveltejs/kit').RequestHandler}
- */
-export async function get() {
-	return {
-		status: 200
-	};
-}
