@@ -2,12 +2,11 @@
 	export const key = {};
 </script>
 
-<script type="ts">
+<script>
 	import { setContext } from 'svelte';
-	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { UserStore } from '@supabase/supabase-auth-helpers/dist/sveltekit';
 
-	export let supabaseClient: SupabaseClient;
+	export let supabaseClient;
 	export let callbackUrl = '/api/auth/callback';
 	export let redirectUrl = '/';
 
